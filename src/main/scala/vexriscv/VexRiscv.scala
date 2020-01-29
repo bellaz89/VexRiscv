@@ -168,18 +168,18 @@ case class VexRiscvConfig(){
 
   // F extension
 
-  object FLOAT_RS1 extends Stageable(new RecFloat33)
-  object FLOAT_RS2 extends Stageable(new RecFloat33)
-  object FLOAT_RS3 extends Stageable(new RecFloat33)
-  object FLOAT_RS1_USE extends Stageable(Bool)
-  object FLOAT_RS2_USE extends Stageable(Bool)
-  object FLOAT_RS3_USE extends Stageable(Bool)
-  object FLOAT_RESULT extends Stageable(new RecFloat33)
-  object FLOAT_REGFILE_WRITE_VALID extends Stageable(Bool)
-  object FLOAT_REGFILE_WRITE_DATA extends Stageable(new RecFloat33)
-  object FLOAT_EXCEPTION extends Stageable(new RiscvFloatExceptions)
-  object FLOAT_ROUNDING extends  Stageable(RiscvRoundingMode())
-  object FLOAT_USE_ROUNDING extends Stageable(Bool)
+  val FLOAT_RS1 = if(withFloat) new Stageable(new RecFloat33) else null
+  val FLOAT_RS2 = if(withFloat) new Stageable(new RecFloat33) else null
+  val FLOAT_RS3 = if(withFloat) new Stageable(new RecFloat33) else null
+  val FLOAT_RS1_USE = if(withFloat) new Stageable(Bool) else null
+  val FLOAT_RS2_USE = if(withFloat) new Stageable(Bool) else null
+  val FLOAT_RS3_USE = if(withFloat) new Stageable(Bool) else null
+  val FLOAT_RESULT = if(withFloat) new Stageable(new RecFloat33) else null
+  val FLOAT_REGFILE_WRITE_VALID = if(withFloat) new Stageable(Bool) else null
+  val FLOAT_REGFILE_WRITE_DATA = if(withFloat) new Stageable(new RecFloat33) else null
+  val FLOAT_EXCEPTION = if(withFloat) new Stageable(new RiscvFloatExceptions) else null
+  val FLOAT_ROUNDING = if(withFloat) new Stageable(RiscvRoundingMode()) else null
+  val FLOAT_USE_ROUNDING = if(withFloat) new Stageable(Bool) else null
 
   object FloatSrc1CtrlEnum extends SpinalEnum(binarySequential){
     val RS = newElement()
@@ -192,11 +192,10 @@ case class VexRiscvConfig(){
   object FloatSrc3CtrlEnum extends SpinalEnum(binarySequential){
     val RS  = newElement()
   }
-  object FLOAT_SRC1_CTRL  extends Stageable(FloatSrc1CtrlEnum())
-  object FLOAT_SRC2_CTRL  extends Stageable(FloatSrc2CtrlEnum())
-  object FLOAT_SRC3_CTRL  extends Stageable(FloatSrc3CtrlEnum())
-
-
+  
+  val FLOAT_SRC1_CTRL = if(withFloat) new Stageable(FloatSrc1CtrlEnum()) else null
+  val FLOAT_SRC2_CTRL = if(withFloat) new Stageable(FloatSrc2CtrlEnum()) else null
+  val FLOAT_SRC3_CTRL = if(withFloat) new Stageable(FloatSrc3CtrlEnum()) else null
 }
 
 
