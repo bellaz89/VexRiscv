@@ -76,6 +76,7 @@ case class VexRiscvConfig(){
   object Src2CtrlEnum extends SpinalEnum(binarySequential){
     val RS, IMI, IMS, PC = newElement() //TODO remplacing ZERO could avoid 32 muxes if SRC_ADD can be disabled
   }
+
   object SRC1_CTRL  extends Stageable(Src1CtrlEnum())
   object SRC2_CTRL  extends Stageable(Src2CtrlEnum())
 }

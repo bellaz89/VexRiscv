@@ -13,10 +13,10 @@ lazy val root = (project in file(".")).
         "org.yaml" % "snakeyaml" % "1.8"
     ),
     name := "VexRiscv"
-  )//.dependsOn(spinalHdlSim,spinalHdlCore,spinalHdlLib)
+  ).dependsOn(spinalHdl_Hardfloat)
 //lazy val spinalHdlSim = ProjectRef(file("../SpinalHDL"), "sim")
 //lazy val spinalHdlCore = ProjectRef(file("../SpinalHDL"), "core")
-//lazy val spinalHdlLib = ProjectRef(file("../SpinalHDL"), "lib")
 
+lazy val spinalHdl_Hardfloat = RootProject(file("./ext/SpinalHDL-HardFloat"))
 
 fork := true
