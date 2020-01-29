@@ -74,31 +74,38 @@ object VexRiscvConfig{
       config.plugins ++= plugins
       config.withMemoryStage = withMemoryStage
       config.withWriteBackStage = withWriteBackStage
-      config.withFloat = false
       config
   }
 
   def apply(withMemoryStage : Boolean, 
             withWriteBackStage : Boolean, 
             plugins : Seq[Plugin[VexRiscv]],
-            withFloat : Boolean): VexRiscvConfig = {
+            withFloat : Boolean,
+            floatExecuteStages : Int): VexRiscvConfig = {
 
       val config = VexRiscvConfig()
       config.plugins ++= plugins
       config.withMemoryStage = withMemoryStage
       config.withWriteBackStage = withWriteBackStage
       config.withFloat = withFloat
+      config.floatExecuteStages = floatExecuteStages
       config
   }
   
-  def apply(plugins : Seq[Plugin[VexRiscv]] = ArrayBuffer()) : VexRiscvConfig = apply(true,true,plugins,false)
-  def withFloat(plugins : Seq[Plugin[VexRiscv]] = ArrayBuffer()) : VexRiscvConfig = apply(true,true,plugins,true)
+  def apply(plugins : Seq[Plugin[VexRiscv]] = ArrayBuffer()) : VexRiscvConfig = apply(true,true,plugins)
+  def withFloat(plugins : Seq[Plugin[VexRiscv]] = ArrayBuffer(),
+                floatExecuteStages : Int = 1) : VexRiscvConfig = apply(true,
+                                                                       true,
+                                                                       plugins,
+                                                                       true,
+                                                                       floatExecuteStages)
 }
 
 case class VexRiscvConfig(){
   var withMemoryStage = true
   var withWriteBackStage = true
   var withFloat = false
+  var floatExecuteStages =  1
   val plugins = ArrayBuffer[Plugin[VexRiscv]]()
 
   def add(that : Plugin[VexRiscv]) : this.type = {plugins += that;this}
