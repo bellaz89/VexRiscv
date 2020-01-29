@@ -211,8 +211,19 @@ class VexRiscv(val config : VexRiscvConfig) extends Component with Pipeline{
   val execute   = newStage()
   val memory    = ifGen(config.withMemoryStage)    (newStage())
   val writeBack = ifGen(config.withWriteBackStage) (newStage())
+  val floatExecute = ArrayBuffer[Stage]
 
+  val stagesFromExecuteOnlyInt = stages.dropWhile(_ != execute)
+
+  if (withFloat && (stagesFromExecuteOnlyInt.length) < floatExecuteStages+1) {
+      (0 to floatExecuteStages-stagesFromExecuteOnlyInt.length).foreach{ newStage() }
+  }
+  
   def stagesFromExecute = stages.dropWhile(_ != execute)
+    
+  if (withFloat) (0 to floatExecuteStages-1).foreach{ i => floatExecute += stagesFromExecute(i)}
+
+  val floatWriteBack = if (withFloat) stagesFromExecute(floatExecuteStages) else null
 
   plugins ++= config.plugins
 
