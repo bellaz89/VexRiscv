@@ -17,8 +17,20 @@ class HazardPessimisticPlugin() extends Plugin[VexRiscv] {
   override def build(pipeline: VexRiscv): Unit = {
     import pipeline._
     import pipeline.config._
+    
+    val writesIntPipeline = (intStagesFromExecute.map(s => s.arbitration.isValid && s.input(REGFILE_WRITE_VALID)) :+ 
+                             RegNext(intStages.last.arbitration.isValid && intStages.last.input(REGFILE_WRITE_VALID)))
 
-    val writesInPipeline = stages.dropWhile(_ != execute).map(s => s.arbitration.isValid && s.input(REGFILE_WRITE_VALID)) :+ RegNext(stages.last.arbitration.isValid && stages.last.input(REGFILE_WRITE_VALID))
-    decode.arbitration.haltByOther.setWhen(decode.arbitration.isValid && writesInPipeline.orR)
+    val writesInPipeline = Bool
+    
+    if(withFloat) {
+      val writesFloatPipeline = (floatStagesFromExecute.map(s => s.arbitration.isValid && (s.input(FLOAT_REGFILE_WRITE_VALID) | s.input(FLOAT_RAISE_EXCEPTION))) :+ 
+                                RegNext(floatStages.last.arbitration.isValid && floatStages.last.input(FLOAT_REGFILE_WRITE_VALID) | floatStages.last.input(FLOAT_RAISE_EXCEPTION)))
+      writesInPipeline := writesIntPipeline.orR | writesFloatPipeline.orR
+    } else {
+      writesInPipeline := writesIntPipeline.orR
+    }
+
+    decode.arbitration.haltByOther.setWhen(decode.arbitration.isValid && writesInPipeline)
   }
 }

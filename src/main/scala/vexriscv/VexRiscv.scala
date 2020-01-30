@@ -178,8 +178,8 @@ case class VexRiscvConfig(){
   val FLOAT_REGFILE_WRITE_VALID = if(withFloat) new Stageable(Bool) else null
   val FLOAT_REGFILE_WRITE_DATA = if(withFloat) new Stageable(new RecFloat33) else null
   val FLOAT_EXCEPTION = if(withFloat) new Stageable(new RiscvFloatExceptions) else null
+  val FLOAT_RAISE_EXCEPTION = if(withFloat) new Stageable(Bool) else null
   val FLOAT_ROUNDING = if(withFloat) new Stageable(RiscvRoundingMode()) else null
-  val FLOAT_USE_ROUNDING = if(withFloat) new Stageable(Bool) else null
 
   object FloatSrc1CtrlEnum extends SpinalEnum(binarySequential){
     val RS = newElement()
@@ -211,19 +211,24 @@ class VexRiscv(val config : VexRiscvConfig) extends Component with Pipeline{
   val execute   = newStage()
   val memory    = ifGen(config.withMemoryStage)    (newStage())
   val writeBack = ifGen(config.withWriteBackStage) (newStage())
-  val floatExecute = ArrayBuffer[Stage]
+  val floatExecute = ArrayBuffer[Stage]()
 
-  val stagesFromExecuteOnlyInt = stages.dropWhile(_ != execute)
-
-  if (withFloat && (stagesFromExecuteOnlyInt.length) < floatExecuteStages+1) {
-      (0 to floatExecuteStages-stagesFromExecuteOnlyInt.length).foreach{ newStage() }
-  }
-  
   def stagesFromExecute = stages.dropWhile(_ != execute)
-    
-  if (withFloat) (0 to floatExecuteStages-1).foreach{ i => floatExecute += stagesFromExecute(i)}
+  
+  val intStages = stages.clone
+  val intStagesFromExecute = stagesFromExecute.clone
 
-  val floatWriteBack = if (withFloat) stagesFromExecute(floatExecuteStages) else null
+  val floatWriteBack = if (withFloat)  {
+      if (intStagesFromExecute.length < floatExecuteStages+1) {
+        (0 to floatExecuteStages-intStagesFromExecute.length).foreach{ i => newStage() }
+      }
+
+      (0 to floatExecuteStages-1).foreach{ i => floatExecute += stagesFromExecute(i)}
+      stagesFromExecute(floatExecuteStages)
+  } else null 
+
+  val floatStages = if(withFloat) stages.takeWhile(_ != floatWriteBack) :+ floatWriteBack else null
+  val floatStagesFromExecute = if(withFloat) floatStages.dropWhile(_ != floatExecute(0)) else null
 
   plugins ++= config.plugins
 
